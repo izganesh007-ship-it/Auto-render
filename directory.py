@@ -8,45 +8,41 @@ URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
 headers = {"Authorization": f"Bearer {NV_API_KEY}", "Content-Type": "application/json"}
 
-# I've simplified the styling instructions to prevent syntax errors
 prompt = """
 Write a single-file Remotion video in TypeScript (src/remotion/index.ts).
-Required Imports: { AbsoluteFill, Audio, Img, interpolate, spring, useCurrentFrame, useVideoConfig, registerRoot, Composition, staticFile }.
+Required Imports: { AbsoluteFill, Audio, Img, useCurrentFrame, registerRoot, Composition, staticFile }.
 
 Logic:
-1. Create a 'MainScene' component. 
-2. Use a navy blue background: <AbsoluteFill style={{backgroundColor: '#000080', justifyContent: 'center', alignItems: 'center'}}>
-3. Display images from 'public/assets/' one by one using <img> tags.
-4. Add <Audio src={staticFile('voiceover.mp3')} />.
-5. Duration: 750 frames.
-6. Export 'RemotionRoot' with <Composition id="DynamicComp" component={MainScene} durationInFrames={750} fps={30} width={1920} height={1080} />.
-7. Call registerRoot(RemotionRoot).
+1. Composition ID: "DynamicComp", Duration: 750 frames.
+2. Background: Navy blue (#000080).
+3. Images: Use an array: const images = ['image1.jfif', 'image2.jfif', 'image3.jfif', 'image4.jfif', 'image5.jfif'];
+4. Audio: Use staticFile('voiceover.mp3').
+5. Use double curly braces for styles: style={{ backgroundColor: '#000080' }}.
 
-IMPORTANT: Ensure all JSX tags are closed correctly. Do not use complex CSS-in-JS libraries. Use standard React 'style' objects. Return ONLY code.
+Return ONLY the raw TypeScript code. No markdown backticks.
 """
 
 payload = {
     "model": MODEL_NAME,
     "messages": [{"role": "user", "content": prompt}],
-    "temperature": 0.1, # Lower temperature = more stable code
-    "extra_body": {"reasoning_effort": "high"}
+    "temperature": 0.1
 }
 
-print("🚀 Fixing syntax and regenerating 25s preview...")
+print("🚀 Regenerating...")
 try:
     response = requests.post(URL, headers=headers, json=payload)
     if response.status_code == 200:
         video_code = response.json()['choices'][0]['message']['content']
         
-        # Clean up tags
-        for tag in ["```tsx", "```typescript", "```"]:
-            video_code = video_code.replace(tag, "")
+        # Safer cleanup loop
+        for junk in ["```tsx", "```typescript", "```"]:
+            video_code = video_code.replace(junk, "")
         
         os.makedirs("src/remotion", exist_ok=True)
         with open("src/remotion/index.ts", "w", encoding="utf-8") as f:
             f.write(video_code.strip())
-        print("✅ Clean code generated in src/remotion/index.ts!")
+        print("✅ Success! src/remotion/index.ts updated.")
     else:
-        print(f"❌ Error: {response.text}")
+        print(f"❌ Error: {response.status_code}")
 except Exception as e:
-    print(f"⚠️ Connection Error: {e}")
+    print(f"⚠️ Error: {e}")
