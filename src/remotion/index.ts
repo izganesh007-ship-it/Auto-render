@@ -1,59 +1,36 @@
-import {AbsoluteFill, Audio, Img, interpolate, spring, useCurrentFrame, useVideoConfig, registerRoot, Composition} from 'remotion';
-import {staticFile} from 'remotion';
-import React from 'react';
+import {AbsoluteFill, Audio, Img, interpolate, spring, useCurrentFrame, useVideoConfig, registerRoot, Composition, staticFile} from 'remotion';
 
-const MainScene: React.FC = () => {
+const MainScene = () => {
   const frame = useCurrentFrame();
   const {fps, width, height} = useVideoConfig();
 
   const images = [
-    staticFile('assets/image1.jpg'),
-    staticFile('assets/image2.jpg'),
-    staticFile('assets/image3.jpg'),
-    staticFile('assets/image4.jpg'),
+    staticFile('assets/image1.png'),
+    staticFile('assets/image2.png'),
+    staticFile('assets/image3.png'),
   ];
 
-  const imageIndex = Math.floor(frame / 150) % images.length;
+  const imageIndex = Math.min(Math.floor(frame / 30), images.length - 1);
   const image = images[imageIndex];
 
-  const scale = spring({
-    frame,
-    fps,
-    from: 1,
-    to: 1.1,
-    config: {
-      damping: 100,
-    },
-  });
-
   return (
-    <AbsoluteFill style={{backgroundColor: 'white'}}>
-      <Img
-        src={image}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          transform: `scale(${scale})`,
-        }}
-      />
+    <AbsoluteFill style={{backgroundColor: '#000080', justifyContent: 'center', alignItems: 'center'}}>
+      <Img src={image} style={{width: width * 0.8, height: height * 0.8, objectFit: 'contain'}} />
       <Audio src={staticFile('voiceover.mp3')} />
     </AbsoluteFill>
   );
 };
 
-const RemotionRoot: React.FC = () => {
+const RemotionRoot = () => {
   return (
-    <>
-      <Composition
-        id="DynamicComp"
-        component={MainScene}
-        durationInFrames={750}
-        fps={30}
-        width={1920}
-        height={1080}
-      />
-    </>
+    <Composition
+      id="DynamicComp"
+      component={MainScene}
+      durationInFrames={750}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
   );
 };
 
