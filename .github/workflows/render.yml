@@ -20,8 +20,8 @@ jobs:
         run: sudo apt-get install -y ffmpeg
 
       - name: Render Video
-        # Note: I changed the path to src/remotion/index.ts based on your file list
-        run: npx remotion render src/remotion/index.ts main out.mp4 --overwrite
+        # Changed 'main' to 'DynamicComp' to match your project's composition ID
+        run: npx remotion render src/remotion/index.ts DynamicComp out.mp4 --overwrite
 
       - name: Upload Video Artifact
         uses: actions/upload-artifact@v4
